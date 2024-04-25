@@ -1,0 +1,121 @@
+//Login with pd validation
+
+//HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up/Login</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div id="signupForm" class="form-container">
+            <h2>Sign Up</h2>
+            <form onsubmit="return validateSignup()">
+                <input type="text" id="signupName" placeholder="Name" required><br>
+                <input type="email" id="signupEmail" placeholder="Email" required><br>
+                <input type="password" id="signupPassword" placeholder="Password" required><br>
+                <button type="submit">Sign Up</button>
+            </form>
+        </div>
+
+        <div id="loginForm" class="form-container">
+            <h2>Login</h2>
+            <form onsubmit="return validateLogin()">
+                <input type="email" id="loginEmail" placeholder="Email" required><br>
+                <input type="password" id="loginPassword" placeholder="Password" required><br>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+
+        <div id="welcomeMessage" class="hidden">
+            <h2>Welcome, <span id="loggedInUser"></span>!</h2>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+//CSS
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.form-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.hidden {
+    display: none;
+}
+
+//Js
+function validatePassword(password) {
+    // Check if password meets length requirement
+    if (password.length < 8) {
+        return false;
+    }
+
+    // Check if password contains at least one uppercase letter
+    var hasUppercase = /[A-Z]/.test(password);
+
+    // Check if password contains at least one lowercase letter
+    var hasLowercase = /[a-z]/.test(password);
+
+    // Check if password contains at least one numerical digit
+    var hasNumerical = /\d/.test(password);
+
+    // Check if password contains at least one special character
+    var hasSpecialChar = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password);
+
+    // Return true if all conditions are met
+    return hasUppercase && hasLowercase && hasNumerical && hasSpecialChar;
+}
+
+function validateSignup() {
+    var name = document.getElementById("signupName").value;
+    var email = document.getElementById("signupEmail").value;
+    var password = document.getElementById("signupPassword").value;
+
+    // Perform validation checks here (e.g., check if fields are empty)
+    if (!validatePassword(password)) {
+        alert("Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one numerical digit, and one special character.");
+        return false; // Prevent form submission
+    }
+
+    // For demonstration, simply display the entered name after sign up
+    alert("Signed up successfully! Welcome, " + name + "!");
+    return false; // Prevent form submission
+}
+
+function validateLogin() {
+    var email = document.getElementById("loginEmail").value;
+    var password = document.getElementById("loginPassword").value;
+
+    // Perform validation checks here (e.g., check if fields are empty, validate email format, etc.)
+    if (!validatePassword(password)) {
+        alert("Invalid password. Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one numerical digit, and one special character.");
+        return false; // Prevent form submission
+    }
+
+    // For demonstration, simply display the entered email after login
+    document.getElementById("loggedInUser").innerText = email;
+    document.getElementById("loginForm").classList.add("hidden");
+    document.getElementById("welcomeMessage").classList.remove("hidden");
+    return false; // Prevent form submission
+}

@@ -1,0 +1,71 @@
+//notification pop up
+
+//HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notification Popup</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <button id="showNotification">Show Notification</button>
+    <div class="notification" id="notification">
+      <span class="close" id="closeNotification">&times;</span>
+      <p>This is a notification message.</p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
+//CSS
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.notification {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 15px 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.notification p {
+  margin: 0;
+}
+
+.close {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  cursor: pointer;
+  font-size: 20px;
+  color: #888;
+}
+
+.close:hover {
+  color: #000;
+}
+
+//JS
+document.getElementById('showNotification').addEventListener('click', function() {
+  document.getElementById('notification').style.display = 'block';
+});
+
+document.getElementById('closeNotification').addEventListener('click', function() {
+  document.getElementById('notification').style.display = 'none';
+});
+

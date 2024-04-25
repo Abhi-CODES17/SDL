@@ -1,0 +1,137 @@
+//email verification using php
+
+//sql
+CREATE DATABASE email_verification;
+
+USE email_verification;
+
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    verified INT DEFAULT 0
+);
+
+CREATE TABLE verification_tokens (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    token VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-----------------------------------------------------------------------
+//db.php
+<?php
+$servername = "localhost";
+$username = "username";
+$password = "password";
+$dbname = "email_verification";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+?>
+
+-----------------------------------------------------------------------
+//register.php
+<?php
+session_start();
+include 'db.php';
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = $_POST['username'];
+    $email = $_POST['email'];
+    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $token = bin2hex(random_bytes(16));
+
+    // Insert user data into the database
+    $sql = "INSERT INTO users (username, email, password) VALUES ('$username', '$email', '$password')";
+    if ($conn->query($sql) === TRUE) {
+        $userId = $conn->insert_id;
+        
+        // Insert verification token into the database
+        $sql = "INSERT INTO verification_tokens (user_id, token) VALUES ('$userId', '$token')";
+        if ($conn->query($sql) === TRUE) {
+            // Send verification email
+            $to = $email;
+            $subject = "Email Verification";
+            $message = "Click the following link to verify your email: http://localhost/verify.php?token=$token";
+            $headers = "From: your_email@example.com";
+
+            if (mail($to, $subject, $message, $headers)) {
+                echo "Registration successful. Please check your email for verification.";
+            } else {
+                echo "Failed to send verification email.";
+            }
+        } else {
+            echo "Error: " . $sql . "<br>" . $conn->error;
+        }
+    } else {
+        echo "Error: " . $sql . "<br>" . $conn->error;
+    }
+}
+?>
+
+-----------------------------------------------------------------------
+//verify.php
+<?php
+include 'db.php';
+
+if (isset($_GET['token'])) {
+    $token = $_GET['token'];
+
+    // Check if the token exists in the database
+    $sql = "SELECT * FROM verification_tokens WHERE token='$token'";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows == 1) {
+        $row = $result->fetch_assoc();
+        $userId = $row['user_id'];
+
+        // Update user verification status in the database
+        $sql = "UPDATE users SET verified=1 WHERE id='$userId'";
+        if ($conn->query($sql) === TRUE) {
+            // Delete the token from the database
+            $sql = "DELETE FROM verification_tokens WHERE token='$token'";
+            $conn->query($sql);
+            
+            echo "Email verification successful. You can now login.";
+        } else {
+            echo "Error: " . $sql . "<br>" . $conn->error;
+        }
+    } else {
+        echo "Invalid verification token.";
+    }
+}
+?>
+
+-----------------------------------------------------------------------
+//register.php
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Registration</title>
+</head>
+<body>
+    <h1>User Registration</h1>
+    <form action="register.php" method="post">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br><br>
+        
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br><br>
+        
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br><br>
+        
+        <button type="submit">Register</button>
+    </form>
+</body>
+</html>
+
+-----------------------------------------------------------------------

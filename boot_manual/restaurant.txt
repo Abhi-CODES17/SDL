@@ -1,0 +1,99 @@
+//restaurant data entry
+
+//restaurant_form.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Data Entry Form</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 50%;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Restaurant Data Entry Form</h2>
+
+<form action="restaurant_activity.php" method="post">
+    <table>
+        <tr>
+            <th colspan="2">Restaurant Information</th>
+        </tr>
+        <tr>
+            <td>Restaurant Name:</td>
+            <td><input type="text" name="restaurant_name" required></td>
+        </tr>
+        <tr>
+            <td>Location:</td>
+            <td><input type="text" name="location" required></td>
+        </tr>
+        <tr>
+            <td>Capacity:</td>
+            <td><input type="number" name="capacity" required></td>
+        </tr>
+        <tr>
+            <td colspan="2"><button type="submit" name="submit">Submit</button></td>
+        </tr>
+    </table>
+</form>
+
+</body>
+</html>
+
+-----------------------------------------------------------------------------------
+//restaurant_activity.php
+<?php
+
+class Activity {
+    public function __construct() {
+        // Constructor
+    }
+
+    public function submitForm() {
+        if (isset($_POST['submit'])) {
+            $restaurantName = $_POST['restaurant_name'];
+            $location = $_POST['location'];
+            $capacity = $_POST['capacity'];
+
+            // Save the restaurant data to database or perform any other action
+            echo "Restaurant Name: $restaurantName <br>";
+            echo "Location: $location <br>";
+            echo "Capacity: $capacity <br>";
+            echo "Form submitted successfully!";
+        }
+    }
+}
+
+// Create an instance of Activity class
+$activity = new Activity();
+
+// Call the submitForm method
+$activity->submitForm();
+
+?>
+
+

@@ -1,0 +1,198 @@
+//grocery appln
+
+//sql
+CREATE TABLE products (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    description TEXT,
+    image VARCHAR(255)
+);
+
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    total DECIMAL(10, 2) NOT NULL,
+    status ENUM('pending', 'completed') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE order_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT,
+    product_id INT,
+    quantity INT,
+    price DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders(id),
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+-----------------------------------------------------------------------
+//db.php
+<?php
+$servername = "localhost";
+$username = "username";
+$password = "password";
+$dbname = "grocery_store";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+?>
+
+-----------------------------------------------------------------------
+//register.php
+<?php
+include 'db.php';
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = $_POST['username'];
+    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+
+    $sql = "INSERT INTO users (username, password) VALUES ('$username', '$password')";
+    if ($conn->query($sql) === TRUE) {
+        echo "Registration successful";
+    } else {
+        echo "Error: " . $sql . "<br>" . $conn->error;
+    }
+}
+?>
+
+-----------------------------------------------------------------------
+//login.php
+<?php
+session_start();
+include 'db.php';
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    $sql = "SELECT * FROM users WHERE username='$username'";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows == 1) {
+        $row = $result->fetch_assoc();
+        if (password_verify($password, $row['password'])) {
+            $_SESSION['user_id'] = $row['id'];
+            header("Location: index.php");
+        } else {
+            echo "Invalid username or password";
+        }
+    } else {
+        echo "Invalid username or password";
+    }
+}
+?>
+
+-----------------------------------------------------------------------
+//logout.php
+<?php
+session_start();
+session_unset();
+session_destroy();
+header("Location: login.php");
+?>
+
+-----------------------------------------------------------------------
+//index.php
+<?php
+include 'db.php';
+
+$sql = "SELECT * FROM products";
+$result = $conn->query($sql);
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Listing</title>
+</head>
+<body>
+    <h1>Products</h1>
+    <ul>
+        <?php while ($row = $result->fetch_assoc()) { ?>
+            <li>
+                <h2><?php echo $row['name']; ?></h2>
+                <p><?php echo $row['description']; ?></p>
+                <p>Price: $<?php echo $row['price']; ?></p>
+                <a href="add_to_cart.php?id=<?php echo $row['id']; ?>">Add to Cart</a>
+            </li>
+        <?php } ?>
+    </ul>
+</body>
+</html>
+
+-----------------------------------------------------------------------
+//add_to_cart.php
+<?php
+session_start();
+include 'db.php';
+
+if (isset($_GET['id'])) {
+    $productId = $_GET['id'];
+    $userId = $_SESSION['user_id'];
+    $quantity = 1;
+
+    $sql = "INSERT INTO order_items (order_id, product_id, quantity, price) VALUES ('$userId', '$productId', '$quantity', '$price')";
+    if ($conn->query($sql) === TRUE) {
+        echo "Product added to cart";
+    } else {
+        echo "Error: " . $sql . "<br>" . $conn->error;
+    }
+}
+?>
+
+-----------------------------------------------------------------------
+//cart.php
+<?php
+session_start();
+include 'db.php';
+
+$userId = $_SESSION['user_id'];
+
+$sql = "SELECT products.*, order_items.quantity 
+        FROM order_items 
+        INNER JOIN products ON order_items.product_id = products.id 
+        WHERE order_items.order_id = '$userId'";
+$result = $conn->query($sql);
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+</head>
+<body>
+    <h1>Shopping Cart</h1>
+    <ul>
+        <?php while ($row = $result->fetch_assoc()) { ?>
+            <li>
+                <h2><?php echo $row['name']; ?></h2>
+                <p><?php echo $row['description']; ?></p>
+                <p>Price: $<?php echo $row['price']; ?></p>
+                <p>Quantity: <?php echo $row['quantity']; ?></p>
+            </li>
+        <?php } ?>
+    </ul>
+</body>
+</html>
+
+-----------------------------------------------------------------------
+
+-----------------------------------------------------------------------

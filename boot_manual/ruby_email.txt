@@ -1,0 +1,85 @@
+//Email ruby
+1.Just click on the user email id
+
+2. go to manage your Google account
+
+3. just click on security set 2 step verification
+
+4. after that search for the app password in the search bar.
+
+5. for creating app password
+
+Just click on Select app
+
+ 2. Select use other location from drop-down box     
+
+ 3. give the name as per your requirement.
+
+ 4 .generate password
+
+ 5. copy the generated Password.
+
+6. open the text editor and paste the code and paste the app password as we copied earlier also give same sender and receiver email id.
+
+7. after all of these steps just go to replit online editor
+
+  1. first we need to login into Editor.
+
+  2 to create replit and Select ruby and give the title Name as you wish and Click on create replit.
+
+  3. paste the same code in the replit.
+
+  4. install the package like "gem install mail" in replit shell itself.
+
+  5. run the program through a command like "ruby main.rb" in replit shell itself.
+
+8. Now you can check your mail. 
+
+
+Below is the code and the file name is: "main.rb"
+
+
+require 'mail'
+
+
+# Set up SMTP settings
+
+Mail.defaults do
+
+  delivery_method :smtp, {
+
+    :address => 'smtp.gmail.com',
+
+    :port => 587,
+
+    :user_name => example@gmail.com
+
+    :password => '16characterpassword',
+
+    :authentication => :login,
+
+    :enable_starttls_auto => true
+
+  }
+
+end
+
+
+# Define email message
+
+message = Mail.new do
+
+  from 'example@gmail.com'
+
+  to 'example@gmail.com'
+
+  subject 'Hello from Ruby!'
+
+  body 'This is a test email sent from Ruby.'
+
+end
+
+
+# Send email
+
+message.deliver!

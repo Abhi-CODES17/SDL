@@ -1,0 +1,195 @@
+//Toll tax mngmnt system
+
+//Mysql
+CREATE DATABASE toll_tax_management;
+
+USE toll_tax_management;
+
+CREATE TABLE vehicles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    registration_number VARCHAR(20) NOT NULL,
+    vehicle_type ENUM('Car', 'Truck', 'Bus', 'Motorcycle') NOT NULL,
+    owner_name VARCHAR(50) NOT NULL,
+    owner_contact VARCHAR(15) NOT NULL
+);
+
+CREATE TABLE payments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    vehicle_id INT NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    payment_date DATE NOT NULL,
+    FOREIGN KEY (vehicle_id) REFERENCES vehicles(id)
+);
+-----------------------------------------------------------
+//db_config.php
+<?php
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "toll_tax_management";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+?>
+
+-----------------------------------------------------------
+//index.php
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toll Tax Management System</title>
+</head>
+<body>
+    <h2>Welcome to Toll Tax Management System</h2>
+    <a href="register_vehicle.php">Register Vehicle</a><br>
+    <a href="make_payment.php">Make Payment</a><br>
+</body>
+</html>
+
+-----------------------------------------------------------
+//register_vehicle.php
+<?php
+require_once('db_config.php');
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $registration_number = $_POST['registration_number'];
+    $vehicle_type = $_POST['vehicle_type'];
+    $owner_name = $_POST['owner_name'];
+    $owner_contact = $_POST['owner_contact'];
+
+    $sql = "INSERT INTO vehicles (registration_number, vehicle_type, owner_name, owner_contact) VALUES ('$registration_number', '$vehicle_type', '$owner_name', '$owner_contact')";
+
+    if ($conn->query($sql) === TRUE) {
+        echo "Vehicle registered successfully.";
+    } else {
+        echo "Error: " . $sql . "<br>" . $conn->error;
+    }
+}
+
+$conn->close();
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Vehicle</title>
+</head>
+<body>
+    <h2>Register Vehicle</h2>
+    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+        <label for="registration_number">Registration Number:</label><br>
+        <input type="text" id="registration_number" name="registration_number" required><br>
+        <label for="vehicle_type">Vehicle Type:</label><br>
+        <select id="vehicle_type" name="vehicle_type" required>
+            <option value="Car">Car</option>
+            <option value="Truck">Truck</option>
+            <option value="Bus">Bus</option>
+            <option value="Motorcycle">Motorcycle</option>
+        </select><br>
+        <label for="owner_name">Owner Name:</label><br>
+        <input type="text" id="owner_name" name="owner_name" required><br>
+        <label for="owner_contact">Owner Contact:</label><br>
+        <input type="text" id="owner_contact" name="owner_contact" required><br><br>
+        <input type="submit" value="Register">
+    </form>
+</body>
+</html>
+
+-----------------------------------------------------------
+//make_payement.php
+<?php
+require_once('db_config.php');
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $vehicle_id = $_POST['vehicle_id'];
+    $amount = $_POST['amount'];
+    $payment_date = date('Y-m-d');
+
+    $sql = "INSERT INTO payments (vehicle_id, amount, payment_date) VALUES ('$vehicle_id', '$amount', '$payment_date')";
+
+    if ($conn->query($sql) === TRUE) {
+        echo "Payment made successfully.";
+    } else {
+        echo "Error: " . $sql . "<br>" . $conn->error;
+    }
+}
+
+$sql = "SELECT id, registration_number FROM vehicles";
+$result = $conn->query($sql);
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Make Payment</title>
+</head>
+<body>
+    <h2>Make Payment</h2>
+    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+        <label for="vehicle_id">Select Vehicle:</label><br>
+        <select id="vehicle_id" name="vehicle_id" required>
+            <?php
+            if ($result->num_rows > 0) {
+                while($row = $result->fetch_assoc()) {
+                    echo "<option value='" . $row['id'] . "'>" . $row['registration_number'] . "</option>";
+                }
+            }
+            ?>
+        </select><br>
+        <label for="amount">Amount:</label><br>
+        <input type="number" id="amount" name="amount" min="0" step="0.01" required><br><br>
+        <input type="submit" value="Make Payment">
+    </form>
+</body>
+</html>
+
+-----------------------------------------------------------
+//view_payement.php
+<?php
+require_once('db_config.php');
+
+if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['vehicle_id'])) {
+    $vehicle_id = $_GET['vehicle_id'];
+
+    $sql = "SELECT registration_number FROM vehicles WHERE id = '$vehicle_id'";
+    $result = $conn->query($sql);
+    $row = $result->fetch_assoc();
+    $registration_number = $row['registration_number'];
+
+    $sql = "SELECT * FROM payments WHERE vehicle_id = '$vehicle_id'";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        echo "<h2>Payment History for Vehicle: " . $registration_number . "</h2>";
+        echo "<table border='1'>";
+        echo "<tr><th>Payment ID</th><th>Amount</th><th>Payment Date</th></tr>";
+        while($row = $result->fetch_assoc()) {
+            echo "<tr>";
+            echo "<td>" . $row['id'] . "</td>";
+            echo "<td>" . $row['amount'] . "</td>";
+            echo "<td>" . $row['payment_date'] . "</td>";
+            echo "</tr>";
+        }
+        echo "</table>";
+    } else {
+        echo "No payments found for this vehicle.";
+    }
+} else {
+    echo "Invalid request.";
+}
+
+$conn->close();
+?>
+
+

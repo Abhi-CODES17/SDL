@@ -1,0 +1,46 @@
+//Js link to html
+
+//HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Examples</title>
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <h1>JavaScript Examples</h1>
+</body>
+</html>
+
+//Js
+// 2. Put an alert
+alert("Hello! This is an alert.");
+
+// 3. Calculate the average number of weeks in a human lifetime
+const averageLifespanYears = 80;
+const weeksInYear = 52;
+const averageWeeksInLifetime = averageLifespanYears * weeksInYear;
+console.log("Average number of weeks in a human lifetime:", averageWeeksInLifetime);
+
+// 4. Create variables to store a string
+var greeting = "Hello, world!";
+let name = "Alice";
+const message = "Welcome to our website.";
+
+console.log(greeting);
+console.log(name);
+console.log(message);
+
+// 5. Program that tells the time of the day
+const currentTime = new Date();
+const currentHour = currentTime.getHours();
+
+if (currentHour >= 6 && currentHour < 12) {
+    console.log("Good morning!");
+} else if (currentHour >= 12 && currentHour < 18) {
+    console.log("Good afternoon!");
+} else {
+    console.log("Good night!");
+}

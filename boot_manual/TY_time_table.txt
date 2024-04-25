@@ -1,0 +1,89 @@
+//TY Time table
+//HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TY Time Table</title>
+    <link rel="stylesheet" href="styles3.css">
+    <!-- Using Bootstrap for styling -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h2 class="text-center my-4">TY Time Table</h2>
+        <table class="table table-bordered text-center">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Time Slot</th>
+                    <th>Monday</th>
+                    <th>Tuesday</th>
+                    <th>Wednesday</th>
+                    <th>Thursday</th>
+                    <th>Friday</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>9:00 AM - 10:00 AM</td>
+                    <td>Maths<br>(Prof. ABC)</td>
+                    <td>Physics<br>(Prof. XYZ)</td>
+                    <td>Chemistry<br>(Prof. LMN)</td>
+                    <td>English<br>(Prof. PQR)</td>
+                    <td>Computer Science<br>(Prof. DEF)</td>
+                </tr>
+                <tr>
+                    <td>10:00 AM - 11:00 AM</td>
+                    <td>English<br>(Prof. PQR)</td>
+                    <td>Computer Science<br>(Prof. DEF)</td>
+                    <td>Maths<br>(Prof. ABC)</td>
+                    <td>Physics<br>(Prof. XYZ)</td>
+                    <td>Chemistry<br>(Prof. LMN)</td>
+                </tr>
+                <tr>
+                    <td>11:10 AM - 12:10 AM</td>
+                    <td>DBMS<br>(Prof. AAA)</td>
+                    <td>Computer Science<br>(Prof. BBB)</td>
+                    <td>Maths<br>(Prof. CCC)</td>
+                    <td>OS<br>(Prof. DDD)</td>
+                    <td>CN<br>(Prof. EEE)</td>
+                </tr>
+                
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+
+//CSS
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f3f3f3;
+}
+
+.container {
+    margin-top: 50px;
+}
+
+.table th, .table td {
+    vertical-align: middle;
+}
+
+.table th {
+    background-color: #343a40;
+    color: #fff;
+}
+
+.table-bordered th, .table-bordered td {
+    border: 1px solid #dee2e6;
+}
+
+.table-bordered th {
+    border-top: 2px solid #dee2e6;
+}
+
+.table-bordered td {
+    border-top: none;
+}
+

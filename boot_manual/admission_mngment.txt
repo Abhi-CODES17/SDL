@@ -1,0 +1,165 @@
+//Admission mngmnt system
+
+-----------------------------------------------------------------
+//sql
+CREATE DATABASE college_admission_management;
+
+USE college_admission_management;
+
+CREATE TABLE students (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    dob DATE NOT NULL,
+    gender ENUM('Male', 'Female', 'Other') NOT NULL,
+    address TEXT NOT NULL,
+    contact VARCHAR(15) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    course VARCHAR(100) NOT NULL,
+    year ENUM('First', 'Second', 'Third', 'Fourth') NOT NULL
+);
+
+-----------------------------------------------------------------
+//db_config.php
+<?php
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "college_admission_management";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+?>
+
+-----------------------------------------------------------------
+//index.php
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Admission Management System</title>
+</head>
+<body>
+    <h2>Welcome to College Admission Management System</h2>
+    <a href="register_student.php">Register Student</a><br>
+    <a href="view_students.php">View Students</a><br>
+</body>
+</html>
+
+-----------------------------------------------------------------
+//register_student.php
+<?php
+require_once('db_config.php');
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $name = $_POST['name'];
+    $dob = $_POST['dob'];
+    $gender = $_POST['gender'];
+    $address = $_POST['address'];
+    $contact = $_POST['contact'];
+    $email = $_POST['email'];
+    $course = $_POST['course'];
+    $year = $_POST['year'];
+
+    $sql = "INSERT INTO students (name, dob, gender, address, contact, email, course, year) VALUES ('$name', '$dob', '$gender', '$address', '$contact', '$email', '$course', '$year')";
+
+    if ($conn->query($sql) === TRUE) {
+        echo "Student registered successfully.";
+    } else {
+        echo "Error: " . $sql . "<br>" . $conn->error;
+    }
+}
+
+$conn->close();
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Student</title>
+</head>
+<body>
+    <h2>Register Student</h2>
+    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+        <label for="name">Name:</label><br>
+        <input type="text" id="name" name="name" required><br>
+        <label for="dob">Date of Birth:</label><br>
+        <input type="date" id="dob" name="dob" required><br>
+        <label for="gender">Gender:</label><br>
+        <select id="gender" name="gender" required>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+        </select><br>
+        <label for="address">Address:</label><br>
+        <textarea id="address" name="address" required></textarea><br>
+        <label for="contact">Contact:</label><br>
+        <input type="text" id="contact" name="contact" required><br>
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email" required><br>
+        <label for="course">Course:</label><br>
+        <input type="text" id="course" name="course" required><br>
+        <label for="year">Year:</label><br>
+        <select id="year" name="year" required>
+            <option value="First">First</option>
+            <option value="Second">Second</option>
+            <option value="Third">Third</option>
+            <option value="Fourth">Fourth</option>
+        </select><br><br>
+        <input type="submit" value="Register">
+    </form>
+</body>
+</html>
+
+-----------------------------------------------------------------
+//view_student.php
+<?php
+require_once('db_config.php');
+
+$sql = "SELECT * FROM students";
+$result = $conn->query($sql);
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Students</title>
+</head>
+<body>
+    <h2>Registered Students</h2>
+    <?php
+    if ($result->num_rows > 0) {
+        echo "<table border='1'>";
+        echo "<tr><th>Name</th><th>Date of Birth</th><th>Gender</th><th>Address</th><th>Contact</th><th>Email</th><th>Course</th><th>Year</th></tr>";
+        while($row = $result->fetch_assoc()) {
+            echo "<tr>";
+            echo "<td>" . $row['name'] . "</td>";
+            echo "<td>" . $row['dob'] . "</td>";
+            echo "<td>" . $row['gender'] . "</td>";
+            echo "<td>" . $row['address'] . "</td>";
+            echo "<td>" . $row['contact'] . "</td>";
+            echo "<td>" . $row['email'] . "</td>";
+            echo "<td>" . $row['course'] . "</td>";
+            echo "<td>" . $row['year'] . "</td>";
+            echo "</tr>";
+        }
+        echo "</table>";
+    } else {
+        echo "No students registered.";
+    }
+    $conn->close();
+    ?>
+</body>
+</html>
+
+-----------------------------------------------------------------
+//

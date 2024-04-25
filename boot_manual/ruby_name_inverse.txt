@@ -1,0 +1,92 @@
+//ruby name inverse
+
+//app.rb
+require 'sinatra'
+
+get '/' do
+
+	erb :index
+
+end
+
+post '/reverse' do
+
+	@first_name = params[:first_name]
+
+	@last_name = params[:last_name]
+
+	@reversed_name = "#{@last_name} #{@first_name}"
+
+	erb :reverse
+
+end
+
+-----------------------------------------------------------------------------------
+//index.erb
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+	<meta charset="UTF-8">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<title>Name Reversal</title>
+
+</head>
+
+<body>
+
+	<h2>Name Reversal</h2>
+
+	<form action="/reverse" method="post">
+
+    	<label for="first_name">First Name:</label>
+
+    	<input type="text" id="first_name" name="first_name" required>
+
+    	<br>
+
+    	<label for="last_name">Last Name:</label>
+
+    	<input type="text" id="last_name" name="last_name" required>
+
+    	<br>
+
+    	<input type="submit" value="Reverse Name">
+
+	</form>
+
+</body>
+
+</html>
+-----------------------------------------------------------------------------------
+//reverse.erb
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+	<meta charset="UTF-8">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<title>Reversed Name</title>
+
+</head>
+
+<body>
+
+	<h2>Reversed Name</h2>
+
+	<p>Your name in reverse order: <%= @reversed_name %></p>
+
+</body>
+
+</html>
+-----------------------------------------------------------------------------------
+ruby app.rb
+http://localhost:4567

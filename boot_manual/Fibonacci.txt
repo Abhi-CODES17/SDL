@@ -1,0 +1,46 @@
+//Fibonacci
+
+//html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fibonacci Series</title>
+</head>
+<body>
+    <h2>Fibonacci Series</h2>
+    <p id="fibonacciSeries"></p>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+//Js
+// Function to generate Fibonacci series up to a given number
+function generateFibonacciSeries(limit) {
+    var fibonacciSeries = [];
+    var a = 0, b = 1;
+
+    while (a <= limit) {
+        fibonacciSeries.push(a);
+        var temp = a;
+        a = b;
+        b = temp + b;
+    }
+
+    return fibonacciSeries;
+}
+
+// Function to display Fibonacci series on HTML page
+function displayFibonacciSeries(series) {
+    var output = "Fibonacci Series: ";
+    output += series.join(", ");
+    document.getElementById("fibonacciSeries").innerText = output;
+}
+
+// Generate Fibonacci series up to 1000
+var fibonacciSeries = generateFibonacciSeries(1000);
+
+// Display Fibonacci series on HTML page
+displayFibonacciSeries(fibonacciSeries);

@@ -1,0 +1,112 @@
+//Calculator
+
+//HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="calculator">
+        <input type="text" class="display" id="display" readonly>
+        <div class="keys">
+            <button class="operator" onclick="clearDisplay()">C</button>
+            <button class="operator" onclick="append('+')">+</button>
+            <button class="operator" onclick="append('-')">-</button>
+            <button class="operator" onclick="append('*')">*</button>
+            <button class="operator" onclick="append('/')">/</button>
+            <button onclick="append('7')">7</button>
+            <button onclick="append('8')">8</button>
+            <button onclick="append('9')">9</button>
+            <button onclick="append('4')">4</button>
+            <button onclick="append('5')">5</button>
+            <button onclick="append('6')">6</button>
+            <button onclick="append('1')">1</button>
+            <button onclick="append('2')">2</button>
+            <button onclick="append('3')">3</button>
+            <button onclick="append('0')">0</button>
+            <button onclick="calculate()">=</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
+
+//CSS
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f3f3f3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.calculator {
+    width: 300px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.display {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 20px;
+}
+
+.keys {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 5px;
+    padding: 10px;
+}
+
+button {
+    padding: 15px;
+    font-size: 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #e0e0e0;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #ccc;
+}
+
+.operator {
+    background-color: #f0f0f0;
+    font-weight: bold;
+    color: #000;
+}
+
+//Js
+let expression = '';
+
+function append(value) {
+    expression += value;
+    document.getElementById('display').value = expression;
+}
+
+function calculate() {
+    try {
+        const result = eval(expression);
+        document.getElementById('display').value = result;
+        expression = '';
+    } catch (error) {
+        document.getElementById('display').value = 'Error';
+        expression = '';
+    }
+}
+
+function clearDisplay() {
+    expression = '';
+    document.getElementById('display').value = '';
+}
