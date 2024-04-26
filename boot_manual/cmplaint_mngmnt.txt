@@ -1,0 +1,246 @@
+//Complaint system
+
+//Mysql
+CREATE DATABASE complaint_management;
+
+USE complaint_management;
+
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL,
+    password VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE complaints (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    title VARCHAR(100) NOT NULL,
+    description TEXT NOT NULL,
+    status ENUM('Pending', 'Resolved') DEFAULT 'Pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-----------------------------------------------------------
+//db_config.php
+<?php
+$servername = "localhost";
+$username = "root";
+$password = "Abhi@17323";
+$dbname = "complaint_management";
+
+// Create connection
+//$conn = new mysqli($servername, $username, $password, $dbname);
+$conn = mysqli_connect('localhost', 'root', '','registration');
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+?>
+
+-----------------------------------------------------------
+//index.php
+<?php
+session_start();
+if(isset($_SESSION['username'])) {
+    header("Location: dashboard.php");
+    exit();
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complaint Management System</title>
+</head>
+<body>
+    <h2>Login</h2>
+    <form action="login.php" method="post">
+        <label for="username">Username:</label><br>
+        <input type="text" id="username" name="username" required><br>
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password" required><br><br>
+        <input type="submit" value="Login">
+    </form>
+</body>
+</html>
+
+-----------------------------------------------------------
+//login.php
+<?php
+require_once('db_config.php');
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    $sql = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows == 1) {
+        session_start();
+        $_SESSION['username'] = $username;
+        header("Location: dashboard.php");
+        exit();
+    } else {
+        echo "Invalid username or password.";
+    }
+}
+
+$conn->close();
+?>
+
+-----------------------------------------------------------
+//dashboard.php
+<?php
+session_start();
+if(!isset($_SESSION['username'])) {
+    header("Location: index.php");
+    exit();
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+</head>
+<body>
+    <h2>Welcome, <?php echo $_SESSION['username']; ?></h2>
+    <a href="submit_complaint.php">Submit Complaint</a><br>
+    <a href="view_complaints.php">View My Complaints</a><br>
+    <a href="view_all_complaints.php">View All Complaints</a><br>
+    <a href="logout.php">Logout</a>
+</body>
+</html>
+
+-----------------------------------------------------------
+//submit_complaints.php
+<?php
+session_start();
+if(!isset($_SESSION['username'])) {
+    header("Location: index.php");
+    exit();
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Complaint</title>
+</head>
+<body>
+    <h2>Submit Complaint</h2>
+    <form action="submit_complaint_process.php" method="post">
+        <label for="title">Title:</label><br>
+        <input type="text" id="title" name="title" required><br>
+        <label for="description">Description:</label><br>
+        <textarea id="description" name="description" required></textarea><br><br>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>
+
+-----------------------------------------------------------
+//submit_complaint_process.php
+<?php
+session_start();
+if(!isset($_SESSION['username'])) {
+    header("Location: index.php");
+    exit();
+}
+
+require_once('db_config.php');
+
+$username = $_SESSION['username'];
+$title = $_POST['title'];
+$description = $_POST['description'];
+
+$sql = "SELECT id FROM users WHERE username = '$username'";
+$result = $conn->query($sql);
+$row = $result->fetch_assoc();
+$user_id = $row['id'];
+
+$sql = "INSERT INTO complaints (user_id, title, description) VALUES ('$user_id', '$title', '$description')";
+
+if ($conn->query($sql) === TRUE) {
+    echo "Complaint submitted successfully.";
+} else {
+    echo "Error: " . $sql . "<br>" . $conn->error;
+}
+
+$conn->close();
+?>
+
+//view_complaints
+<?php
+session_start();
+if(!isset($_SESSION['username'])) {
+    header("Location: index.php");
+    exit();
+}
+
+require_once('db_config.php');
+
+$username = $_SESSION['username'];
+
+$sql = "SELECT id FROM users WHERE username = '$username'";
+$result = $conn->query($sql);
+$row = $result->fetch_assoc();
+$user_id = $row['id'];
+
+$sql = "SELECT * FROM complaints WHERE user_id = '$user_id'";
+$result = $conn->query($sql);
+
+if ($result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {
+        echo "Title: " . $row["title"]. " - Description: " . $row["description"]. " - Status: " . $row["status"]. "<br>";
+    }
+} else {
+    echo "No complaints found.";
+}
+
+$conn->close();
+?>
+
+-----------------------------------------------------------
+//vie_all_complaints.php
+<?php
+session_start();
+if(!isset($_SESSION['username'])) {
+    header("Location: index.php");
+    exit();
+}
+
+require_once('db_config.php');
+
+$sql = "SELECT * FROM complaints";
+$result = $conn->query($sql);
+
+if ($result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {
+        echo "Title: " . $row["title"]. " - Description: " . $row["description"]. " - Status: " . $row["status"]. "<br>";
+    }
+} else {
+    echo "No complaints found.";
+}
+
+$conn->close();
+?>
+
+-----------------------------------------------------------
+//logout.php
+<?php
+session_start();
+session_unset();
+session_destroy();
+header("Location: index.php");
+exit();
+?>
